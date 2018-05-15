@@ -1,0 +1,164 @@
+/*
+ * This file is part of Molina.
+ * 
+ * Molina is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version
+ * 3 of the License, or (at your option) any later version.
+ *
+ * Molina is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ *   This file implements a bitboard data structure.
+ *
+ *   Although it is typically considered poor programming practice,
+ *   the bitboard will be composed of global variables.  This is in
+ *   keeping with the practice of Stockfish and enables faster execution
+ *   and less memory requirements
+ */
+
+#ifndef BITBOARD_HPP
+#define BITBOARD_HPP
+
+#include "types.hpp"
+
+#include <array>
+#include <iostream>
+#include <string>
+#include <math.h>
+#include <assert.h>
+
+// White pieces
+u64 wPawn;
+u64 wRook;
+u64 wKnight;
+u64 wBishop;
+u64 wQueen;
+u64 wKing;
+
+// Black pieces
+u64 bPawn;
+u64 bRook;
+u64 bKnight;
+u64 bBishop;
+u64 bQueen;
+u64 bKing;
+
+// various flags
+array<bool, 4> castle; // convention: 0 = a1, 1 = h1, 2 = a8, 3 = h8
+u64 enPassant;
+
+
+/*
+ * Initializes bitboard to default starting position for chess
+ */
+void init_bitboard()
+{
+    wPawn   = 0b00000000'11111111'00000000'00000000'00000000'00000000'00000000'00000000;
+    wRook   = 0b10000001'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+    wKnight = 0b01000010'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+    wBishop = 0b00100100'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+    wQueen  = 0b00001000'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+    wKing   = 0b00010000'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+
+    bPawn   = 0b00000000'00000000'00000000'00000000'00000000'00000000'11111111'00000000;
+    bRook   = 0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'10000001;
+    bKnight = 0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'01000010;
+    bBishop = 0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'00100100;
+    bQueen  = 0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'00010000;
+    bKing   = 0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'00001000;
+
+    castle.fill(true);
+    enPassant = 0;
+
+}
+
+/*
+ *  Given a string representing a square,
+ *  i.e. "e6", return the u64 corresponding
+ *  to that square
+ */
+u64 find_square(const string square)
+{
+    assert(square.length() == 2);
+    int file = (int)(square[0])-97; // Convert from ascii table
+    int rank = (int)(square[1]); // How to do this?
+    return pow(2, 8*rank + file);
+}
+
+/*
+ *  Given a squares rank and file,
+ *  return the u64 corresponding
+ *  to that square
+ */
+u64 find_square(const int rank, const int file)
+{
+    return pow(2, 8*rank + file);
+}
+/*
+ *  Move based on long algebraic notation, i.e.
+ *  e2e4 moves the piece on e2 to the square e4
+ *  e7e5 is white short castling
+ *  e7e8q is pawn promotion to queen
+ */
+bool make_move(string move)
+{
+    return true;
+}
+
+/*
+ *  Prints to std out for debugging
+ */
+void print_bitboard()
+{
+    cout << "\n  +----+----+----+----+----+----+----+----+ " << endl;
+    for(int rank=0; rank<8; ++rank)
+    {
+        cout << rank+1 << " ";
+        for(int file=0; file<8; ++file)
+        {
+            u64 pos = find_square(rank, file);
+            // White pieces
+            if(pos & wPawn)
+                cout << "| wP ";
+            else if(pos & wRook)
+                cout << "| wR ";
+            else if(pos & wKnight)
+                cout << "| wN ";
+            else if(pos & wBishop)
+                cout << "| wB ";
+            else if(pos & wQueen)
+                cout << "| wQ ";
+            else if(pos & wKing)
+                cout << "| wK ";
+            // Black pieces
+            else if(pos & bPawn)
+                cout << "| bP ";
+            else if(pos & bRook)
+                cout << "| bR ";
+            else if(pos & bKnight)
+                cout << "| bN ";
+            else if(pos & bBishop)
+                cout << "| bB ";
+            else if(pos & bQueen)
+                cout << "| bQ ";
+            else if(pos & bKing)
+                cout << "| bK ";
+            else
+                cout << "|    ";
+        }
+        cout << "|\n  +----+----+----+----+----+----+----+----+ " << endl;
+    }
+    cout << "    A    B    C    D    E    F    G    H\n\n";
+}
+
+
+
+#endif // BITBOARD_HPP
